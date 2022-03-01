@@ -1,0 +1,55 @@
+<configuration>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- encoders are assigned the type
+             ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <property resource = "application.properties"/>
+    <springProperty name="appName" source="spring.application.name"/>
+    <appender name="STASH" class="ch.qos.logback.core.rolling.RollingFileAppender">
+<!--        <file>logback/redditApp.log</file>-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logback/logs-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+<!--        <append>true</append>-->
+        <encoder class = "net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <pattern>
+                    <pattern>
+                        {
+                        "appName":${spring.application.name}
+                        }
+                    </pattern>
+                </pattern>
+            <timestamp>
+                <fieldName>timestamp</fieldName>
+                <timeZone>UTC</timeZone>
+            </timestamp>
+            <loggerName>
+                <fieldName>logger</fieldName>
+            </loggerName>
+            <logLevel>
+                <fieldName>level</fieldName>
+            </logLevel>
+            <threadName>
+                <fieldName>thread</fieldName>
+            </threadName>
+            </providers>
+
+<!--        <charset>utf-8</charset>-->
+<!--        <pattern class="net.logstash.logback.encoder.LogstashEncoder">%d{dd-MM HH:mm:ss.SSS} [%thread] %-5level %logger{66} - ${spring.application.name}%n</pattern>-->
+        </encoder>
+
+    </appender>
+
+
+    <root level="DEBUG">
+        <appender-ref ref="STASH" />
+        <appender-ref ref="STDOUT" />
+    </root>
+</configuration>
